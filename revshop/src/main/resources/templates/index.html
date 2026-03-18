@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{fragments/layout :: main-layout(~{::section})}">
+<body>
+    <section>
+        <div class="hero">
+            <h1>Upgrade Your Lifestyle</h1>
+            <p>Discover the best deals on premium products, only at RevShop.</p>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search for products..." onkeydown="if(event.key==='Enter') searchProducts()">
+                <button onclick="searchProducts()">Search</button>
+            </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="category-bar" id="categoryBar">
+            <button class="category-pill active" onclick="filterByCategory(null, this)">All</button>
+            <!-- Categories loaded via JS -->
+        </div>
+
+        <div class="container">
+            <h2 id="sectionTitle" style="margin-bottom: 2rem; font-weight: 700; font-family: 'Outfit', sans-serif;">Featured Products</h2>
+            <div class="product-grid" id="productGrid">
+                <!-- Products loaded via JS -->
+            </div>
+            <div id="noResults" style="display:none; text-align:center; padding:3rem; color:var(--text-muted);">
+                <h3 style="font-family:'Outfit',sans-serif; margin-bottom:0.5rem;">No products found</h3>
+                <p>Try a different search or category.</p>
+            </div>
+        </div>
+
+        <script th:inline="none">
+            let allProducts = [];
+            let categories = [];
+            let activeCategoryId = null;
+
+            async function loadCategories() {
+                const res = await fetch('/api/categories');
+                categories = await res.json();
+                const bar = document.getElementById('categoryBar');
+                categories.forEach(c => {
+                    const btn = document.createElement('button');
+                    btn.className = 'category-pill';
+                    btn.textContent = c.name;
+                    btn.onclick = function() { filterByCategory(c.categoryId, this); };
+                    bar.appendChild(btn);
+                });
+            }
+
+            async function loadProducts() {
+                const res = await fetch('/api/products');
+                allProducts = await res.json();
+                renderProducts(allProducts);
+            }
+
+            function renderProducts(products) {
+                const grid = document.getElementById('productGrid');
+                const noResults = document.getElementById('noResults');
+                if (products.length === 0) {
+                    grid.innerHTML = '';
+                    noResults.style.display = 'block';
+                    return;
+                }
+                noResults.style.display = 'none';
+                grid.innerHTML = products.map(p => `
+                    <div class="product-card">
+                        <a href="/product/${p.productId}" style="text-decoration:none; color:inherit;">
+                            <img src="${p.primaryImageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}" 
+                                 class="product-image" alt="${p.name}">
+                        </a>
+                        <div class="product-info">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div class="product-rating">${p.averageRating > 0 ? '⭐ ' + p.averageRating : ''}</div>
+                                <button class="heart-btn ${p.favorited ? 'favorited' : ''}" onclick="toggleFavorite(${p.productId}, this)">
+                                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                </button>
+                            </div>
+                            <a href="/product/${p.productId}" style="text-decoration:none; color:inherit;">
+                                <h3 class="product-name">${p.name}</h3>
+                            </a>
+                            <p class="product-desc">${p.description || ''}</p>
+                            <div class="product-footer">
+                                <div>
+                                    <span class="product-price">₹${p.price.toFixed(2)}</span>
+                                    ${p.mrp && p.mrp > p.price ? '<span class="product-mrp">₹' + p.mrp.toFixed(2) + '</span>' : ''}
+                                </div>
+                                <button class="btn-add-cart" onclick="addToCart(${p.productId})">Add to Cart</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function filterByCategory(categoryId, btn) {
+                document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                activeCategoryId = categoryId;
+
+                const title = document.getElementById('sectionTitle');
+                if (categoryId === null) {
+                    title.textContent = 'Featured Products';
+                    renderProducts(allProducts);
+                } else {
+                    const cat = categories.find(c => c.categoryId === categoryId);
+                    title.textContent = cat ? cat.name : 'Products';
+                    renderProducts(allProducts.filter(p => p.categoryName === (cat ? cat.name : '')));
+                }
+            }
+
+            async function searchProducts() {
+                const q = document.getElementById('searchInput').value.trim();
+                const title = document.getElementById('sectionTitle');
+                if (!q) {
+                    title.textContent = 'Featured Products';
+                    renderProducts(allProducts);
+                    return;
+                }
+                title.textContent = 'Search Results for "' + q + '"';
+                document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+                document.querySelector('.category-pill').classList.add('active');
+                activeCategoryId = null;
+
+                const res = await fetch('/api/products/search?q=' + encodeURIComponent(q));
+                const results = await res.json();
+                renderProducts(results);
+            }
+
+            loadCategories();
+            loadProducts();
+        </script>
+    </section>
+</body>
+</html>

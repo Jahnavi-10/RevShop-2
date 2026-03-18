@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: main-layout(~{::section})}">
+<body>
+    <section>
+        <div class="container py-5">
+            <div class="row justify-content-center text-center">
+                <div class="col-12 col-md-7">
+                    <div class="py-5">
+                        <div class="display-1 fw-bold text-danger mb-3">500</div>
+                        <div class="mb-4">
+                            <i class="bi bi-exclamation-triangle" style="font-size: 5rem; color: #dc2626; opacity: 0.4;"></i>
+                        </div>
+                        <h2 class="fw-bold mb-2" style="font-family: 'Outfit', sans-serif;">Something Went Wrong</h2>
+                        <p class="text-muted mb-2 fs-5">We're having some trouble on our end. Our team has been notified.</p>
+                        <p th:if="${message}" class="text-muted small mb-4 bg-light rounded-2 p-2">Error: <span th:text="${message}"></span></p>
+                        <div class="d-flex gap-3 justify-content-center mt-4">
+                            <a href="/" class="btn btn-primary btn-lg px-4 rounded-3 fw-semibold">
+                                <i class="bi bi-house me-2"></i>Back to Home
+                            </a>
+                            <a href="javascript:location.reload()" class="btn btn-outline-danger btn-lg px-4 rounded-3 fw-semibold">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Try Again
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

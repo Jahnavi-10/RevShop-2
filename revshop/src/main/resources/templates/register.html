@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: main-layout(~{::section})}">
+<body>
+    <section class="auth-section">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+                    <div class="card shadow-lg border-0 rounded-4 p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width:64px;height:64px;">
+                                <i class="bi bi-person-plus text-primary fs-2"></i>
+                            </div>
+                            <h2 class="fw-bold mb-1" style="font-family:'Outfit',sans-serif;">Create Account</h2>
+                            <p class="text-muted mb-0">Join RevShop to start shopping or selling</p>
+                        </div>
+
+                        <div id="register-error" class="alert alert-danger d-flex align-items-center gap-2 d-none" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i><span></span>
+                        </div>
+                        <div id="register-success" class="alert alert-success d-flex align-items-center gap-2 d-none" role="alert">
+                            <i class="bi bi-check-circle-fill"></i><span></span>
+                        </div>
+
+                        <form id="registerForm" novalidate>
+                            <!-- Role Selector -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Select Your Role</label>
+                                <div class="d-flex gap-3">
+                                    <label class="flex-fill role-option">
+                                        <input type="radio" name="role" value="BUYER" checked onchange="toggleRoleFields()" class="d-none">
+                                        <div class="role-label text-center py-2 px-3 rounded-3 fw-semibold cursor-pointer">
+                                            <i class="bi bi-person-heart me-2"></i>Buyer
+                                        </div>
+                                    </label>
+                                    <label class="flex-fill role-option">
+                                        <input type="radio" name="role" value="SELLER" onchange="toggleRoleFields()" class="d-none">
+                                        <div class="role-label text-center py-2 px-3 rounded-3 fw-semibold cursor-pointer">
+                                            <i class="bi bi-shop me-2"></i>Seller
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Full Name -->
+                                <div class="col-12 col-sm-6">
+                                    <label for="name" class="form-label fw-semibold">Full Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-person text-muted"></i></span>
+                                        <input type="text" id="name" name="name" class="form-control" placeholder="John Doe"
+                                               pattern="^[a-zA-Z\s]+$" required>
+                                    </div>
+                                    <div class="text-danger small mt-1" id="name-feedback"></div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-12 col-sm-6">
+                                    <label for="email" class="form-label fw-semibold">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-envelope text-muted"></i></span>
+                                        <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" required>
+                                    </div>
+                                    <div class="text-danger small mt-1" id="email-feedback"></div>
+                                </div>
+
+                                <!-- Mobile -->
+                                <div class="col-12 col-sm-6">
+                                    <label for="mobileNumber" class="form-label fw-semibold">Mobile Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-phone text-muted"></i></span>
+                                        <input type="tel" id="mobileNumber" name="mobileNumber" class="form-control" placeholder="9876543210"
+                                               pattern="[6-9][0-9]{9}" required>
+                                    </div>
+                                    <div class="text-danger small mt-1" id="mobile-feedback"></div>
+                                </div>
+
+                                <!-- Password -->
+                                <div class="col-12 col-sm-6">
+                                    <label for="password" class="form-label fw-semibold">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-lock text-muted"></i></span>
+                                        <input type="password" id="password" name="password" class="form-control" placeholder="••••••••"
+                                               pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_!]).{8,}$" required>
+                                        <button class="btn btn-light border" type="button" id="togglePassword"><i class="bi bi-eye text-muted"></i></button>
+                                    </div>
+                                    <div class="text-danger small mt-1" id="password-feedback"></div>
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div class="col-12 col-sm-6">
+                                    <label for="confirmPassword" class="form-label fw-semibold">Confirm Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-lock-fill text-muted"></i></span>
+                                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="••••••••" required>
+                                        <button class="btn btn-light border" type="button" id="toggleConfirm"><i class="bi bi-eye text-muted"></i></button>
+                                    </div>
+                                    <div class="text-danger small mt-1" id="confirm-feedback"></div>
+                                </div>
+
+                                <!-- Address -->
+                                <div class="col-12">
+                                    <label for="address" class="form-label fw-semibold">Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-geo-alt text-muted"></i></span>
+                                        <input type="text" id="address" name="address" class="form-control" placeholder="123 Shopping St, City" required>
+                                    </div>
+                                    <div class="text-danger small mt-1" id="address-feedback"></div>
+                                </div>
+
+                                <!-- Seller-only: Business Name -->
+                                <div class="col-12" id="seller-fields" style="display:none;">
+                                    <label for="businessName" class="form-label fw-semibold">Business Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-building text-muted"></i></span>
+                                        <input type="text" id="businessName" name="businessName" class="form-control" placeholder="Your Brand Name">
+                                    </div>
+                                    <div class="text-danger small mt-1" id="business-feedback"></div>
+                                </div>
+
+                                <!-- Security Question -->
+                                <div class="col-12 col-sm-6">
+                                    <label for="securityQuestionId" class="form-label fw-semibold">Security Question</label>
+                                    <select id="securityQuestionId" name="securityQuestionId" class="form-select" required>
+                                        <option value="">Select a question...</option>
+                                        <option th:each="q : ${securityQuestions}"
+                                                th:value="${q.questionId}"
+                                                th:text="${q.questionText}"></option>
+                                    </select>
+                                    <div class="text-danger small mt-1" id="sq-feedback"></div>
+                                </div>
+
+                                <!-- Security Answer -->
+                                <div class="col-12 col-sm-6">
+                                    <label for="securityAnswer" class="form-label fw-semibold">Security Answer</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-shield-check text-muted"></i></span>
+                                        <input type="text" id="securityAnswer" name="securityAnswer" class="form-control" placeholder="Your Answer" required>
+                                    </div>
+                                    <div class="text-danger small mt-1" id="sa-feedback"></div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold fs-6 rounded-3 mt-4">
+                                <i class="bi bi-person-check me-2"></i>Register Now
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <p class="text-muted mb-0">Already have an account?
+                                <a th:href="@{/login}" class="text-primary fw-semibold text-decoration-none">Login Here</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const STRONG_PASSWORD_RE = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=_!]).{8,}$/;
+            const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const MOBILE_RE = /^[6-9][0-9]{9}$/;
+            const NAME_RE = /^[a-zA-Z\s]+$/;
+
+            function setFeedback(inputId, feedbackId, message) {
+                const el = document.getElementById(inputId);
+                const fb = document.getElementById(feedbackId);
+                if (message) {
+                    el.classList.add('is-invalid'); el.classList.remove('is-valid');
+                    fb.textContent = message;
+                } else if (el.value) {
+                    el.classList.remove('is-invalid'); el.classList.add('is-valid');
+                    fb.textContent = '';
+                } else {
+                    el.classList.remove('is-invalid', 'is-valid');
+                    fb.textContent = '';
+                }
+            }
+
+            function validateConfirmPassword() {
+                const p = document.getElementById('password').value;
+                const cp = document.getElementById('confirmPassword').value;
+                if (!cp) { setFeedback('confirmPassword', 'confirm-feedback', ''); return; }
+                if (p !== cp) setFeedback('confirmPassword', 'confirm-feedback', 'Passwords do not match.');
+                else setFeedback('confirmPassword', 'confirm-feedback', null);
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                // Wire up live validators
+                document.getElementById('name').addEventListener('input', () => {
+                    const v = document.getElementById('name').value;
+                    if (!v) { setFeedback('name','name-feedback',''); return; }
+                    setFeedback('name','name-feedback', NAME_RE.test(v) ? null : 'Name must contain only letters and spaces.');
+                });
+                document.getElementById('email').addEventListener('input', () => {
+                    const v = document.getElementById('email').value;
+                    if (!v) { setFeedback('email','email-feedback',''); return; }
+                    setFeedback('email','email-feedback', EMAIL_RE.test(v) ? null : 'Please enter a valid email address.');
+                });
+                document.getElementById('mobileNumber').addEventListener('input', () => {
+                    const v = document.getElementById('mobileNumber').value;
+                    if (!v) { setFeedback('mobileNumber','mobile-feedback',''); return; }
+                    setFeedback('mobileNumber','mobile-feedback', MOBILE_RE.test(v) ? null : 'Mobile must be 10 digits starting with 6-9.');
+                });
+                document.getElementById('password').addEventListener('input', () => {
+                    const v = document.getElementById('password').value;
+                    if (!v) { setFeedback('password','password-feedback',''); return; }
+                    setFeedback('password','password-feedback', STRONG_PASSWORD_RE.test(v) ? null : 'Min 8 chars with uppercase, lowercase, number, and symbol.');
+                    validateConfirmPassword();
+                });
+                document.getElementById('confirmPassword').addEventListener('input', validateConfirmPassword);
+                document.getElementById('address').addEventListener('input', () => {
+                    const v = document.getElementById('address').value;
+                    setFeedback('address','address-feedback', v.length >= 5 ? null : (v ? 'Address is too short.' : ''));
+                });
+                document.getElementById('securityAnswer').addEventListener('input', () => {
+                    const v = document.getElementById('securityAnswer').value;
+                    setFeedback('securityAnswer','sa-feedback', v.length >= 2 ? null : (v ? 'Answer is too short.' : ''));
+                });
+                document.getElementById('securityQuestionId').addEventListener('change', () => {
+                    const v = document.getElementById('securityQuestionId').value;
+                    setFeedback('securityQuestionId','sq-feedback', v ? null : 'Please select a security question.');
+                });
+
+                // Password toggle
+                function makeToggle(btnId, inputId) {
+                    document.getElementById(btnId).addEventListener('click', () => {
+                        const inp = document.getElementById(inputId);
+                        const isText = inp.type === 'text';
+                        inp.type = isText ? 'password' : 'text';
+                        document.querySelector('#'+btnId+' i').className = isText ? 'bi bi-eye text-muted' : 'bi bi-eye-slash text-muted';
+                    });
+                }
+                makeToggle('togglePassword', 'password');
+                makeToggle('toggleConfirm', 'confirmPassword');
+
+                // Form submit
+                document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const data = Object.fromEntries(formData.entries());
+
+                    if (data.mobileNumber) data.mobileNumber = parseInt(data.mobileNumber);
+                    if (data.securityQuestionId) data.securityQuestionId = parseInt(data.securityQuestionId);
+
+                    const errorDiv = document.getElementById('register-error');
+                    const successDiv = document.getElementById('register-success');
+                    errorDiv.classList.add('d-none');
+                    successDiv.classList.add('d-none');
+
+                    if (data.password !== data.confirmPassword) {
+                        setFeedback('confirmPassword', 'confirm-feedback', 'Passwords do not match.');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/users/register', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+                        if (response.ok) {
+                            successDiv.querySelector('span').textContent = 'Registration successful! Redirecting to login...';
+                            successDiv.classList.remove('d-none');
+                            setTimeout(() => window.location.href = '/login', 2000);
+                        } else {
+                            const err = await response.json();
+                            errorDiv.querySelector('span').textContent = err.message || 'Registration failed. Please try again.';
+                            errorDiv.classList.remove('d-none');
+                        }
+                    } catch (err) {
+                        errorDiv.querySelector('span').textContent = 'An error occurred. Please try again later.';
+                        errorDiv.classList.remove('d-none');
+                    }
+                });
+
+                window.toggleRoleFields();
+            });
+
+            window.toggleRoleFields = function() {
+                const role = document.querySelector('input[name="role"]:checked')?.value;
+                const sellerFields = document.getElementById('seller-fields');
+                const businessName = document.getElementById('businessName');
+                if (role === 'SELLER') {
+                    sellerFields.style.display = 'block';
+                    businessName.required = true;
+                } else {
+                    sellerFields.style.display = 'none';
+                    businessName.required = false;
+                }
+            };
+        </script>
+    </section>
+</body>
+</html>
